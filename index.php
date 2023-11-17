@@ -11,13 +11,13 @@ class Game {
         $turns = $difficulty[Utils::getRandomNbr(0, 2)];
         echo "Nombre de tours dans le jeu: " . $turns . "<br>";
         $player = $characters[Utils::getRandomNbr(0, 2)];
-        echo "Personnage pour le jeu: " . $player->name . "<br>";
-        echo "Caractéristiques du personnage: " . $player->nbrMarbles . " billes, - " . $player->penalty . " billes par partie perdue et + " . $player->bonus . " par partie gagnée" . "<br>";
+        echo "Personnage pour le jeu: " . $player->getName() . "<br>";
+        echo "Caractéristiques du personnage: " . $player->getNbrMarbles() . " billes, - " . $player->getPenalty() . " billes par partie perdue et + " . $player->getBonus() . " par partie gagnée" . "<br>";
         $this->confrontations($turns, $enemies, $player);
         echo "<br>";
         echo "<br>";
 
-        if ($player->nbrMarbles > 0 ) {
+        if ($player->getNbrMarbles() > 0 ) {
             echo "Bravo t pas mort";
         } else {
             echo "t mort";
@@ -29,27 +29,27 @@ class Game {
         for ($currentTurn; $currentTurn < $turns; $currentTurn++) {
             $enemy = $enemies[$currentTurn];
             echo "<br> Tour: " . $currentTurn + 1 . "<br>";
-            echo "Vous affrontez " . $enemy->name . ", " . $enemy->age . " ans" . "<br>";
-            echo "Vous avez " . $player->nbrMarbles . " billes <br>";
+            echo "Vous affrontez " . $enemy->getName() . ", " . $enemy->getAge() . " ans" . "<br>";
+            echo "Vous avez " . $player->getNbrMarbles() . " billes <br>";
 
             $confrontationResult = Utils::getRandomNbr(0, 1);
 
-            if ($enemy->age > 70 && Utils::getRandomNbr(0, 1) == 0) {
-                echo "L'adversaire possède " . $enemy->nbrMarbles . " billes <br>";
+            if ($enemy->getAge() > 70 && Utils::getRandomNbr(0, 1) == 0) {
+                echo "L'adversaire possède " . $enemy->getNbrMarbles() . " billes <br>";
                 echo "Vous volez ses billes <br>";
-                $player->nbrMarbles += $enemy->nbrMarbles;
+                $player->setNbrMarbles($player->getNbrMarbles() + $enemy->getNbrMarbles());
             } else {
 
                 $playerGuess = $this->getPlayerGuess($confrontationResult);
-                $gameResult = $this->getGameResult($playerGuess, $enemy->nbrMarbles);
+                $gameResult = $this->getGameResult($playerGuess, $enemy->getNbrMarbles());
 
                 $this->applyGameResult($enemy, $player, $gameResult);
 
-                if ($player->nbrMarbles <= 0) {
+                if ($player->getNbrMarbles() <= 0) {
                     break;
                 }
             }
-            echo "Vous avez " . $player->nbrMarbles . " billes <br>";
+            echo "Vous avez " . $player->getNbrMarbles() . " billes <br>";
         }
     }
 
@@ -78,35 +78,51 @@ class Game {
 
     private function applyGameResult($enemy, $player, $gameResult)
     {
-        echo "L'adversaire possède " . $enemy->nbrMarbles . " billes <br>";
+        echo "L'adversaire possède " . $enemy->getNbrMarbles() . " billes <br>";
 
         if ($gameResult == "win") {
             echo "Win <br>";
-            if ($player->warCry != "none") {
-                echo $player->warCry . "<br>";
+            if ($player->getWarCry() != "none") {
+                echo $player->getWarCry() . "<br>";
             }
-            echo "Bonus de " . $player->bonus . " billes <br>";
-            $player->nbrMarbles += $enemy->nbrMarbles;
-            $reward = $player->bonus;
+            echo "Bonus de " . $player->getBonus() . " billes <br>";
+            $player->setNbrMarbles($player->getNbrMarbles() + $enemy->getNbrMarbles());
+            $reward = $player->getBonus();
         } else {
             echo "Lose <br>";
-            echo "Malus de " . $player->penalty . " billes <br>";
-            $player->nbrMarbles -= $enemy->nbrMarbles;
-            $reward = -$player->penalty;
+            echo "Malus de " . $player->getPenalty() . " billes <br>";
+            $player->setNbrMarbles($player->getNbrMarbles() - $enemy->getNbrMarbles());
+            $reward = -$player->getPenalty();
         }
-        $player->nbrMarbles += $reward;
+        $player->setNbrMarbles($player->getNbrMarbles() + $reward);
     }
 }
 
 class Person {
-    public $name;
-    public $nbrMarbles;
+    protected $name;
+    protected $nbrMarbles;
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getNbrMarbles() {
+        return $this->nbrMarbles;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    public function setNbrMarbles($nbrMarbles) {
+        $this->nbrMarbles = $nbrMarbles;
+    }
 }
 
 class Character extends Person {
-    public $penalty;
-    public $bonus;
-    public $warCry;
+    private $penalty;
+    private $bonus;
+    private $warCry;
 
     public function __construct($name, $nbrMarbles, $penalty, $bonus, $warCry = "none") {
         $this->name = $name;
@@ -115,15 +131,47 @@ class Character extends Person {
         $this->bonus = $bonus;
         $this->warCry = $warCry;    
     }
+
+    public function getPenalty() {
+        return $this->penalty;
+    }
+
+    public function getBonus() {
+        return $this->bonus;
+    }
+
+    public function getWarCry() {
+        return $this->warCry;
+    }
+
+    public function setPenalty($penalty) {
+        $this->penalty = $penalty;
+    }
+
+    public function setBonus($bonus) {
+        $this->bonus = $bonus;
+    }
+
+    public function setWarCry($warCry) {
+        $this->warCry = $warCry;
+    }
 };
 
 class Enemy extends Person {
-    public $age;
+    private $age;
 
     public function __construct($name, $nbrMarbles, $age) {
         $this->name = $name;
         $this->nbrMarbles = $nbrMarbles;
         $this->age = $age;   
+    }
+
+    public function getAge() {
+        return $this->age;
+    }
+
+    public function setAge($age) {
+        $this->name = $age;
     }
 }
 
