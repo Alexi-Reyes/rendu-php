@@ -7,8 +7,7 @@ class Utils {
 }
 
 class Game {
-    public function __construct($difficulty, $characters, $enemies) {
-        $turns = $difficulty[Utils::getRandomNbr(0, 2)];
+    public function __construct($turns, $characters, $enemies) {
         echo "Nombre de tours dans le jeu: " . $turns . "<br>";
         $player = $characters[Utils::getRandomNbr(0, 2)];
         echo "Personnage pour le jeu: " . $player->getName() . "<br>";
@@ -175,8 +174,19 @@ class Enemy extends Person {
     }
 }
 
+function generateTurns() {
+    $difficulty = [5, 10, 20];
+    $turns = $difficulty[Utils::getRandomNbr(0, 2)];
+    return $turns;
+}
 
-$difficulty = [5, 10, 20];
+function generateEnemies($turns) {
+    $enemies = [];
+    for ($i = 0; $i <= $turns; $i++)
+    array_push($enemies, new Enemy("Name" . $i, Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)));
+    shuffle($enemies);
+    return $enemies;
+}
 
 $characters = [
     new Character("Seong Gi-hun", "15", "2", "1", "ez"),
@@ -184,29 +194,4 @@ $characters = [
     new Character("Cho Sang-woo", "35", "0", "3")
 ];
 
-
-$enemies = [
-    new Enemy("Name1", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name2", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name3", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name4", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name5", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name6", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name7", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name8", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name9", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name10", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name11", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name12", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name13", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name14", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name15", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name16", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name17", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name18", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name19", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-    new Enemy("Name20", Utils::getRandomNbr(1, 20), Utils::getRandomNbr(20, 100)),
-];
-shuffle($enemies);
-
-new Game($difficulty, $characters, $enemies);
+new Game(generateTurns(), $characters, generateEnemies(generateTurns()));
